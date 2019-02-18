@@ -1,5 +1,24 @@
 //--------slackからメッセージ受け取ります-------//
-function doGet(e) {   
+function doGet() { 
+  var slackPostMessage = "注射　本";
+  
+  var e = { "parameter" : {
+    "channel_name":"sandbox",
+    "user_id":"U96LWBQ5T",
+       "user_name":"wankoma.k",
+       "trigger_word":"注射",
+       "service_id":"517948553011",
+       "team_domain":"koha-koma-koru",
+       "team_id":"T96EFAAM9",
+       "text":slackPostMessage,
+       "channel_id":"CF79C24P2",
+       "token":"GcqfK3g55MQHI9rV72OAIKuM",
+       "timestamp":"1549338872.000300"},
+           "contextPath":"",
+           "contentLength":281,
+           "queryString":""
+          };
+ 
   if(e.parameter.user_name != "slackbot"){
      doPost(e); 
   }
@@ -14,9 +33,20 @@ function menuChange(e) {
   var halfBlank = " ";
   var blank = "　";
   var message = "";
+  var matchNumberOfNeedles = /^\d*本/;
+  var matchQuestionNumberOfNeedles = '何本';
   var messageFromSlack = e.parameter.text.replace(blank, halfBlank).split(halfBlank);
   
-  return messageFromSlack[1];
+  spreadSheetInit();
+  
+  if(messageFromSlack[1].indexOf(matchQuestionNumberOfNeedles) != -1) {
+     message = getNowNumberOfNeedles() + "本です。";
+     
+ } else if(messageFromSlack[1].match(matchNumberOfNeedles) != -1) {
+     message = "登録しました！";
+  
+ }
+  return message;
 }
 
 //--------実際にpostします-------//
