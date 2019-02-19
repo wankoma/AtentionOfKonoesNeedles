@@ -32,7 +32,7 @@ function doGet() {
 function menuChange(e) {
   var halfBlank = " ";
   var blank = "　";
-  var message = "";
+  var message = "メッセージが認識できませんでした。";
   var matchNumberOfNeedles = /^\d*本/;
   var matchQuestionNumberOfNeedles = '何本';
   var messageFromSlack = e.parameter.text.replace(blank, halfBlank).split(halfBlank);
