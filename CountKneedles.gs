@@ -1,5 +1,5 @@
-  var amLine = new Date("2019-02-06T07:30:00.872+09:00");
-  var pmLine = new Date("2019-02-06T19:30:00.872+09:00");
+  var amLine = new Date("2019-02-06T07:00:00.872+09:00");
+  var pmLine = new Date("2019-02-06T19:00:00.872+09:00");
   var minitOfDay = 1000 * 60 * 60 * 24;
 
 /**
@@ -12,7 +12,7 @@ function getNowNumberOfNeedles() {
     
   //末端(最新)のレコードを返却
   var havingNeedles = Math.floor(data.slice(-1)[0][4]);
-  var purchaseDay = new Date(data.slice(-1)[0][3]);
+  var purchaseDay = new Date(data.slice(-1)[0][1]);
   var today = new Date(); 
   
   var nowNeedles = culcNowNumberOfNeedles(purchaseDay, today, havingNeedles);
@@ -66,7 +66,8 @@ function culcNowNumberOfNeedles(purchaseDay, today, havingNumberOfNeedles) {
   var useDays =　((today.getTime() - purchaseDay.getTime()) / minitOfDay);
   
   //１日に2本使用し、当日７時・19時で使用する
-  var useNeedles = Math.floor(useDays * 2);
+  var useNeedles = (Math.floor(useDays) * 2);
+  
   if(today.getTime() >= amLine.getTime()){
     useNeedles = useNeedles + 1;
     

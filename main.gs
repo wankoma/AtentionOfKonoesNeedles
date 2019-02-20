@@ -40,11 +40,13 @@ function menuChange(e) {
   spreadSheetInit();
   
   if(messageFromSlack[1].indexOf(matchQuestionNumberOfNeedles) != -1) {
-     message = getNowNumberOfNeedles() + "本です。";
+     message = getNowNumberOfNeedles() + "本ですにゃ～。";
      
  } else if(messageFromSlack[1].match(matchNumberOfNeedles) != -1) {
      message = "登録しました！";
   
+ } else {
+     message = "現在の本数を知りたければ、\n　何本　と記入してくださいにゃ\n注射の登録の場合は\n (数値) + 本と記入してくださいにゃ！"
  }
   return message;
 }
