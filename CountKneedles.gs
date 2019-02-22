@@ -3,6 +3,15 @@
   var minitOfDay = 1000 * 60 * 60 * 24;
 
 /**
+* SpreadSheetを使用するにあったって事前準備メソッド
+*/
+function spreadSheetInit() {
+  SpreadSheetIO(PropertiesService.getScriptProperties().getProperty('SPREAD_SHEET_KEY'), PropertiesService.getScriptProperties().getProperty('SHEET_NAME'));
+  getMainSheet();
+  
+}
+
+/**
 * 現在の注射本数を返却します.
 * @return numberOfNeedles 現在の注射本数
 */
@@ -44,15 +53,6 @@ function insertNeedles(number) {
 }
 
 /**
-* SpreadSheetを使用するにあったって事前準備メソッド
-*/
-function spreadSheetInit() {
-  SpreadSheetIO(PropertiesService.getScriptProperties().getProperty('SPREAD_SHEET_KEY'), PropertiesService.getScriptProperties().getProperty('SHEET_NAME'));
-  getMainSheet();
-  
-}
-
-/**
 * 現在の注射器本数を計算します.
 *
 * @param purchaseDay 購入日
@@ -67,14 +67,8 @@ function culcNowNumberOfNeedles(purchaseDay, today, havingNumberOfNeedles) {
   
   //１日に2本使用し、当日７時・19時で使用する
   var useNeedles = (Math.floor(useDays) * 2);
-  
-  if(today.getTime() >= amLine.getTime()){
-    useNeedles = useNeedles + 1;
-    
-  } else if (today.getTime() >= pmLine.getTime()){
-    useNeedles = useNeedles + 2;
-  }
-  
+  useNeedles = (useNeedles + calcUsingNeedleToday(today));
+ 
   havingNumberOfNeedles = havingNumberOfNeedles - useNeedles;
   
   return havingNumberOfNeedles;
@@ -90,8 +84,52 @@ function culcNowNumberOfNeedles(purchaseDay, today, havingNumberOfNeedles) {
 */
 function calcLimitDay(today, havingNumberOfNeedles) {
   
-  //現在の日付との差分＝havingNumberOfNeedlesを2で割って切り上げを行う
-  //差分を現在の日付に足す
+  var limitDay = new Date(today.getTime());
+
+  var usePeriod = today.getTime() + ((havingNumberOfNeedles / 2) * minitOfDay);
+  limitDay.setTime(usePeriod)
+  
+  //午前午後による注射器本数計算によって、午前午後を判定する.
+  if (calcUsingNeedleToday(limitDay) > 1) {
+    limitDay.setHours(pmLine.getHours());
+    limitDay.setMinutes(1); 
+    return limitDay;
+    
+  } else {
+    limitDay.setHours(amLine.getHours());
+    limitDay.setMinutes(1);  
+    return limitDay;
+  }
+ 
+}
+
+/**
+* 当日注射を何本使用しているのか、時刻から計算します.
+* 現在、7時・19時で使用.
+* @param today: 本日の日付
+* @retrun :本日の使用本数
+*/
+function calcUsingNeedleToday(today) {
+  
+   if (today.getTime() >= amLine.getTime()) {
+    return 1;
+    
+  } else if (today.getTime() >= pmLine.getTime()) {
+    return 2;
+    
+  } else {
+    return 0;
+    
+  }
+  
+}
+
+function limitDay_test() {
+  var buyingNeedles = 0;
+  var today = new Date("2020-02-28T07:00:00.872+09:00"); 
+  var havingNumberOfNeedles = getNowNumberOfNeedles() + buyingNeedles;
+  
+  var limitDay = calcLimitDay(today, havingNumberOfNeedles);
   
 }
 

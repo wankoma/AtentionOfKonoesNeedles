@@ -1,6 +1,6 @@
 //--------slackからメッセージ受け取ります-------//
 function doGet() { 
-  var slackPostMessage = "注射　本";
+  var slackPostMessage = "注射　3本";
   
   var e = { "parameter" : {
     "channel_name":"sandbox",
@@ -42,11 +42,11 @@ function menuChange(e) {
   if(messageFromSlack[1].indexOf(matchQuestionNumberOfNeedles) != -1) {
      message = getNowNumberOfNeedles() + "本ですにゃ～。";
      
- } else if(messageFromSlack[1].match(matchNumberOfNeedles) != -1) {
+ } else if(messageFromSlack[1].match(matchNumberOfNeedles) != null) {
      message = "登録しました！";
   
  } else {
-     message = "現在の本数を知りたければ、\n　何本　と記入してくださいにゃ\n注射の登録の場合は\n (数値) + 本と記入してくださいにゃ！"
+     message = "現在の本数を知りたければ、\n　注射　何本 \nと記入してくださいにゃ\n注射の登録の場合は、\n 　注射　(数値) + 本 \nと記入してくださいにゃ！"
  }
   return message;
 }
