@@ -34,22 +34,21 @@ function getNowNumberOfNeedles() {
 * @return numberOfNeedles 現在の注射本数
 */
 function insertNeedles(number) {
-  /* TODO 引数の注射針本数を数値化する必要がある？ */
-  /* 現在保有している注射数から、どのくらい持つのか日数を割り出す*/
-  spreadSheetInit();
-  var result = false;
-  
-  /* key, today, limitday, stockNeedles, nowPurchaseNeedles
-  var nowKey = sheet.getRange('A:A').getValues().filter(String);
-  var key = Math.floor(nowKey.slice(-1) + 1);
-  var today = new Date(); 
-  var nowPurchaseNeedles = getNowNumberOfNeedles() + number;
-  var data = [key, today, number, '2019-02-20T14:39:12.872+09:00', nowPurchaseNeedles];
-  
-  insertData(data)
-  */
-  
-  return result;
+    try {
+      spreadSheetInit();
+      var nowKey = sheet.getRange('A:A').getValues().filter(String);
+      var key = Math.floor(nowKey.slice(-1) + 1);
+      var today = new Date(); 
+      var havingNumberOfNeedlesByNow = getNowNumberOfNeedles() + number;
+      var limitDay = calcLimitDay(today, havingNumberOfNeedlesByNow);
+      var data = [key, today, number, limitDay, havingNumberOfNeedlesByNow];
+      
+      insertData(data);
+      return number + "本でとうろくしましたにゃー！" + "\nぜんぶで　" + havingNumberOfNeedlesByNow + "本になったにゃ！\n" + limitDay.toString() + "が終了日にゃ～" ;
+    } catch(e) {
+      return "え、エラーが発生しましたにゃ！\n" + e + "\nすぐにえんじにゃーさんに報告にゃ！";
+    
+    }
 }
 
 /**
@@ -61,15 +60,23 @@ function insertNeedles(number) {
 * @return 注射器の残数
 */
 function culcNowNumberOfNeedles(purchaseDay, today, havingNumberOfNeedles) {
-  var n = purchaseDay.getTime();
-  var s = today.getTime();
   var useDays =　((today.getTime() - purchaseDay.getTime()) / minitOfDay);
+  var apPurchaseDay = calcUsingNeedleByToday(purchaseDay);
+  var apTodayDay = calcUsingNeedleByToday(today);
+  var useNeedles = 0;
   
-  //１日に2本使用し、当日７時・19時で使用する
-  var useNeedles = (Math.floor(useDays) * 2);
-  useNeedles = (useNeedles + calcUsingNeedleToday(today));
- 
-  havingNumberOfNeedles = havingNumberOfNeedles - useNeedles;
+  //半日も経過しておらず、午前午後が同一ならば計算しない.
+  if (useDays < 0.5 && apTodayDay != apPurchaseDay){    
+    return havingNumberOfNeedles - apTodayDay;
+      
+  } else if (useDays >= 0.5) {  
+    //１日に2本使用し、当日７時・19時で使用する
+   useNeedles = (Math.floor(useDays) * 2);
+   if(apTodayDay != apPurchaseDay) useNeedles + apTodayDay;
+    
+   return havingNumberOfNeedles - useNeedles;
+   
+  }
   
   return havingNumberOfNeedles;
 }
@@ -82,24 +89,36 @@ function culcNowNumberOfNeedles(purchaseDay, today, havingNumberOfNeedles) {
 * @param havingNeedles 所持している注射器本数
 * @return 注射器の在庫が無くなる日付
 */
-function calcLimitDay(today, havingNumberOfNeedles) {
+function calcLimitDay(today, havingNumberOfNeedlesByNow) {
   
   var limitDay = new Date(today.getTime());
 
-  var usePeriod = today.getTime() + ((havingNumberOfNeedles / 2) * minitOfDay);
+  var usePeriod = today.getTime() + ((havingNumberOfNeedlesByNow / 2) * minitOfDay);
   limitDay.setTime(usePeriod)
+  var apLimitDay = calcUsingNeedleByToday(limitDay);
   
-  //午前午後による注射器本数計算によって、午前午後を判定する.
-  if (calcUsingNeedleToday(limitDay) > 1) {
+  /*　けっこうめんどいぞ・・・
+  　０時～６時は前日の日付で出してほしい　→　うるう年は？！？！？！？
+  
+  //リミット時刻を7時/19時にセットする
+  //「時刻による注射器本数計算」によって、午前午後を判定する.
+  if (apLimitDay == 1) {
+    limitDay.setHours(amLine.getHours());
+    limitDay.setMinutes(1);  
+    return limitDay;
+    
+  } else if(apLimitDay == 2){
     limitDay.setHours(pmLine.getHours());
     limitDay.setMinutes(1); 
     return limitDay;
     
   } else {
-    limitDay.setHours(amLine.getHours());
-    limitDay.setMinutes(1);  
+    limitDay.setHours(pmLine.getHours());
+    limitDay.setMinutes(1); 
     return limitDay;
   }
+  */
+  return limitDay;
  
 }
 
@@ -109,12 +128,12 @@ function calcLimitDay(today, havingNumberOfNeedles) {
 * @param today: 本日の日付
 * @retrun :本日の使用本数
 */
-function calcUsingNeedleToday(today) {
+function calcUsingNeedleByToday(calcDay) {
   
-   if (today.getTime() >= amLine.getTime()) {
+   if (calcDay.getHours() >= amLine.getHours()) {
     return 1;
     
-  } else if (today.getTime() >= pmLine.getTime()) {
+  } else if (calcDay.getHours() >= pmLine.getHours()) {
     return 2;
     
   } else {
@@ -130,6 +149,12 @@ function limitDay_test() {
   var havingNumberOfNeedles = getNowNumberOfNeedles() + buyingNeedles;
   
   var limitDay = calcLimitDay(today, havingNumberOfNeedles);
+  
+}
+
+function insertNeedles_test() {
+  insertNeedles(1);
+  
   
 }
 
