@@ -35,14 +35,42 @@ function menuChange(e) {
   var message = "メッセージが認識できませんでした。";
   var matchNumberOfNeedles = /^\d*本/;
   var matchQuestionNumberOfNeedles = '何本';
+  /* ebisawa: このreplaceは受けっとたメッセージに含まれる全角スペースを半角スペースに変換する処理っぽそうなんだけど、
+  JavaScriptのreplaceにはトラップがあって、最初にヒットした文字しか置換してくれない（つまり1回のみ）
+  もし受け取ったメッセージに含まれる全角スペースを全部置換したいならこう
+  e.parameter.text.replace(/　/g, ' ');
+  https://marycore.jp/prog/js/replace-all/ 
+  （//で文字を囲むのはJavaScriptだと「正規表現文字列ですよ」の意味になる
+  　gはglobalという意味で、文字列内すべてを走査するという意味になる）*/
   var messageFromSlack = e.parameter.text.replace(blank, halfBlank).split(halfBlank);
   
   spreadSheetInit();
   
+  /* ebisawa: このif文でmessageにテキストを入れて返してるけど、適宜返してあげてよさそう
+    if(messageFromSlack[1].indexOf(matchQuestionNumberOfNeedles) != -1) {
+     return getNowNumberOfNeedles() + "本ですにゃ～。";
+     
+ } else if(messageFromSlack[1].match(matchNumberOfNeedles) != null) {
+     addNeedles = messageFromSlack[1].replace('本', '');
+     addNeedles = parseInt(addNeedles);
+     
+   if(isNaN(addNeedles)) {
+     return "数字で入力してほしいにゃ・・・・・";
+     
+   } else {
+     return insertNeedles(addNeedles);
+   }
+     
+  
+ } 
+ …
+ 的な！
+  */
   if(messageFromSlack[1].indexOf(matchQuestionNumberOfNeedles) != -1) {
      message = getNowNumberOfNeedles() + "本ですにゃ～。";
      
  } else if(messageFromSlack[1].match(matchNumberOfNeedles) != null) {
+   // ebisawa: addNeedlesがvarを使って宣言されてないのでグローバル変数になってそう
      addNeedles = messageFromSlack[1].replace('本', '');
      addNeedles = parseInt(addNeedles);
      
@@ -55,6 +83,15 @@ function menuChange(e) {
      
   
  } else {
+   /* ebisawa:
+   message = [
+     'にゃ～？',
+     '現在の本数を知りたければ',
+     '注射　何本',
+     'と記入してくださいにゃ',
+   ].join('\n');
+   みたいな感じにしてあげると見やすいかも（行数は増えるが）
+   */
      message = "にゃ～？\n現在の本数を知りたければ\n　注射　何本 \nと記入してくださいにゃ\n注射の登録の場合は\n 　注射　(数値) + 本 \nと記入してくださいにゃ！"
  }
   return message;
@@ -63,9 +100,11 @@ function menuChange(e) {
 //--------実際にpostします-------//
 function doPost(e) {
   var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
+  // ebisawa: JavaScriptはcamelCase推奨だったと思う
   var bot_name = "このえ";
   var bot_icon = "";
   var message = "";
+  // ebisawa: encodingOptionCodeは使ってなさそう
   var encodingOptionCode = "camel";
   var app = SlackApp.create(token);
   
