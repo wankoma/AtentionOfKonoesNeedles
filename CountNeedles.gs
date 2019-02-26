@@ -102,34 +102,12 @@ function calcNowNumberOfNeedles(purchaseDay, today, havingNumberOfNeedles) {
 * @return 注射器の在庫が無くなる日付
 */
 function calcLimitDay(today, havingNumberOfNeedlesByNow) {
-  
   var limitDay = new Date(today.getTime());
-
   var usePeriod = today.getTime() + ((havingNumberOfNeedlesByNow / 2) * minitOfDay);
+  
   limitDay.setTime(usePeriod)
   var apLimitDay = calcUsingNeedleByToday(limitDay);
   
-  /*　けっこうめんどいぞ・・・
-  　０時～６時は前日の日付で出してほしい　→　うるう年は？！？！？！？
-  
-  //リミット時刻を7時/19時にセットする
-  //「時刻による注射器本数計算」によって、午前午後を判定する.
-  if (apLimitDay == 1) {
-    limitDay.setHours(amLine.getHours());
-    limitDay.setMinutes(1);  
-    return limitDay;
-    
-  } else if(apLimitDay == 2){
-    limitDay.setHours(pmLine.getHours());
-    limitDay.setMinutes(1); 
-    return limitDay;
-    
-  } else {
-    limitDay.setHours(pmLine.getHours());
-    limitDay.setMinutes(1); 
-    return limitDay;
-  }
-  */
   return limitDay;
  
 }
