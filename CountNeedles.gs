@@ -32,8 +32,7 @@ function getNowNumberOfNeedles() {
   //末端(最新)のレコードを返却
   var havingNeedles = Math.floor(data.slice(-1)[0][4]);
   var purchaseDay = new Date(data.slice(-1)[0][1]);
-  var today = new Date(); 
-  
+  var today = new Date();   
   var nowNeedles = calcNowNumberOfNeedles(purchaseDay, today, havingNeedles);
   
   return nowNeedles;
@@ -55,9 +54,9 @@ function insertNeedles(number) {
       
       insertData(data);
       return number + "本でとうろくしましたにゃー！" + "\nぜんぶで　" + havingNumberOfNeedlesByNow + "本になったにゃ！\n" + limitDay.toString() + "が終了日にゃ～" ;
+      
     } catch(e) {
       return "え、エラーが発生しましたにゃ！\n" + e + "\nすぐにえんじにゃーさんに報告にゃ！";
-    
     }
 }
 
@@ -77,17 +76,14 @@ function calcNowNumberOfNeedles(purchaseDay, today, havingNumberOfNeedles) {
   
   //TODO ドゥ・モルガンの定理　適用要検証
   //半日も経過しておらず、午前午後が同一ならば計算しない.
-  if (!(useDays < 0.5 || apTodayDay == apPurchaseDay)){ 
-    
+  if (!(useDays < 0.5 || apTodayDay == apPurchaseDay)){    
     return havingNumberOfNeedles - (apTodayDay - apPurchaseDay);
       
   } else if (useDays >= 0.5) {  
     //１日に2本使用し、当日７時・19時で使用する
    useNeedles = (Math.floor(useDays) * 2);
-   if(apTodayDay != apPurchaseDay) useNeedles + apTodayDay;
-    
-   return havingNumberOfNeedles - useNeedles;
-   
+   if(apTodayDay != apPurchaseDay) useNeedles + apTodayDay;     
+   return havingNumberOfNeedles - useNeedles;   
   }
   
   return havingNumberOfNeedles;
@@ -104,12 +100,10 @@ function calcNowNumberOfNeedles(purchaseDay, today, havingNumberOfNeedles) {
 function calcLimitDay(today, havingNumberOfNeedlesByNow) {
   var limitDay = new Date(today.getTime());
   var usePeriod = today.getTime() + ((havingNumberOfNeedlesByNow / 2) * minitOfDay);
-  
   limitDay.setTime(usePeriod)
-  var apLimitDay = calcUsingNeedleByToday(limitDay);
+  //var apLimitDay = calcUsingNeedleByToday(limitDay);
   
   return limitDay;
- 
 }
 
 /**
@@ -118,43 +112,32 @@ function calcLimitDay(today, havingNumberOfNeedlesByNow) {
 * @param today: 本日の日付
 * @retrun :本日の使用本数
 */
-function calcUsingNeedleByToday(calcDay) {
-  
+function calcUsingNeedleByToday(calcDay) {  
   var apCalcDay = calcDay.getHours();
   var amHour = amLine.getHours();
   var pmHour = pmLine.getHours();
-  
-  /* ebisawa: ここはこうするとすっきりしそう
+
   if (calcDay.getHours() >= pmLine.getHours()) return 2;
   if (calcDay.getHours() >= amLine.getHours()) return 1;
   return 0;
-  */
-  
-   if (calcDay.getHours() >= pmLine.getHours()) {
-    return 2;
-    
-  } else if (calcDay.getHours() >= amLine.getHours()) {
-    return 1;
-    
-  } else {
-    return 0;
-    
-  }
-  
 }
 
-function limitDay_test() {
-  
+
+
+
+
+
+
+
+function limitDay_test() { 
   spreadSheetInit();
   var data = getAllData();
     
   //末端(最新)のレコードを返却
   var havingNumberOfNeedles = Math.floor(data.slice(-1)[0][4]);
-  var purchaseDay = new Date(data.slice(-1)[0][1]);
-  
+  var purchaseDay = new Date(data.slice(-1)[0][1]); 
   var buyingNeedles = 0;
-  var today = new Date("2019-02-23T20:00:00.872+09:00"); 
-  
+  var today = new Date("2019-02-23T20:00:00.872+09:00");  
   var limitDay = calcNowNumberOfNeedles(purchaseDay, today, havingNumberOfNeedles) 
   
 }
