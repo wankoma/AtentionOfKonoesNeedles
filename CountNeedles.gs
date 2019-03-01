@@ -46,15 +46,19 @@ function insertNeedles(number) {
   try {
     spreadSheetInit();
     var nowKey = sheet.getRange('A:A').getValues().filter(String);
-    var key = Math.floor(nowKey.slice(-1)) + 1;
+    var key = Number(nowKey.slice(-1)) + 1;
+    
     var today = new Date(); 
     var havingNumberOfNeedlesByNow = getNowNumberOfNeedles() + number;
     var limitDay = calcLimitDay(today, havingNumberOfNeedlesByNow);
     var data = [key, today, number, limitDay, havingNumberOfNeedlesByNow];
+    //リマインダを注射器期日の5日前にセットします.
+    var triggerDay = new Date((limitDay.getTime() -(5 * minitOfDay)));
     
-    //注射器期日の5日前にリマインダをセットします.
-    setTrigger(limitDay.setTime(limitDay.getTime() -(5 * minitOfDay)));
-    return number + "本でとうろくしましたにゃー！" + "\nぜんぶで　" + havingNumberOfNeedlesByNow + "本になったにゃ！\n" + limitDay.toString() + "が終了日にゃ～" ;
+    insertData(data);
+    setTrigger(triggerDay);
+
+    return number + "本でとうろくしましたにゃー！" + "\nぜんぶで　" + havingNumberOfNeedlesByNow + "本になったにゃ！\n" + String(limitDay) + "が終了日にゃ～" ;
     
   } catch(e) {
     return "え、エラーが発生しましたにゃ！\n" + e + "\nすぐにえんじにゃーさんに報告にゃ！";
@@ -89,7 +93,6 @@ function calcNowNumberOfNeedles(purchaseDay, today, havingNumberOfNeedles) {
   return havingNumberOfNeedles;
 }
 
-
 /**
 * あと何日注射器が持つのか計算します.
 *
@@ -120,7 +123,3 @@ function calcUsingNeedleByToday(calcDay) {
   if (calcDay.getHours() >= amLine.getHours()) return 1;
   return 0;
 }
-
-
-
-

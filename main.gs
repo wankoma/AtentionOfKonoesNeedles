@@ -7,8 +7,13 @@
 function doPost(e) { 
   
   if(e.parameter.user_name != "slackbot"){
-    e.parameter.text = menuChange(e);
-    doPostMessage(e); 
+    try {
+      e.parameter.text = menuChange(e);
+      doPostMessage(e); 
+      
+    } catch(e) {
+      return "え、エラーが発生しましたにゃ！\n" + e + "\nすぐにえんじにゃーさんに報告にゃ！";
+    }
   }
 }
 
@@ -30,8 +35,8 @@ function menuChange(e) {
   } else if(messageFromSlack[1].match(matchNumberOfNeedles) != null) {
     var addNeedles = messageFromSlack[1].replace('本', '');
     addNeedles = parseInt(addNeedles);
-    
     if(isNaN(addNeedles))return "数字で入力してほしいにゃ・・・・・";    
+    
     return insertNeedles(addNeedles);    
     
   } else {
